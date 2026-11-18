@@ -162,6 +162,58 @@ const alertSchema = new mongoose.Schema({
 
 const Alert = mongoose.model("Alert", alertSchema);
 
+const journeySchema = new mongoose.Schema(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
+    },
+    destination: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 200,
+    },
+    expectedArrival: {
+      type: Date,
+      required: true,
+    },
+    gracePeriodMinutes: {
+      type: Number,
+      default: 10,
+      min: 1,
+      max: 60,
+    },
+    status: {
+      type: String,
+      enum: ["IN_PROGRESS", "COMPLETED", "CANCELLED", "OVERDUE"],
+      default: "IN_PROGRESS",
+    },
+    startedAt: {
+      type: Date,
+      default: Date.now,
+    },
+    completedAt: {
+      type: Date,
+      default: null,
+    },
+    overdueNotifiedAt: {
+      type: Date,
+      default: null,
+    },
+    demoOnly: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  { timestamps: true }
+);
+
+const Journey = mongoose.model("Journey", journeySchema);
+
+
 /* =========================================================
    JWT AUTHENTICATION MIDDLEWARE
 ========================================================= */
@@ -669,6 +721,160 @@ app.patch(
       res.status(500).json({
         message: "Unable to resolve SOS alert",
       });
+    }
+  }
+);
+
+/* =========================================================
+   JOURNEY APIs - DEMO ONLY
+========================================================= */
+
+// Create a journey
+app.post("/api/journeys", authenticateToken, async (req, res) => {
+  try {
+    const { destination, expectedArrival, gracePeriodMinutes } = req.body;
+
+    if (!destination || !destination.trim() || !expectedArrival) {
+      return res.status(400).json({
+        message: "Destination and expected arrival are required",
+      });
+    }
+
+    const arrival = new Date(expectedArrival);
+
+    if (Number.isNaN(arrival.getTime()) || arrival <= new Date()) {
+      return res.status(400).json({
+        message: "Expected arrival must be a valid future date and time",
+      });
+    }
+
+    const grace = gracePeriodMinutes === undefined
+      ? 10
+      : Number(gracePeriodMinutes);
+
+    if (!Number.isInteger(grace) || grace < 1 || grace > 60) {
+      return res.status(400).json({
+        message: "Grace period must be between 1 and 60 minutes",
+      });
+    }
+
+    const journey = await Journey.create({
+      userId: req.user.userId,
+      destination: destination.trim(),
+      expectedArrival: arrival,
+      gracePeriodMinutes: grace,
+      status: "IN_PROGRESS",
+      demoOnly: true,
+    });
+
+    res.status(201).json({
+      message: "Demo journey created successfully",
+      journey,
+    });
+  } catch (error) {
+    console.error("Create journey error:", error);
+    res.status(500).json({ message: "Unable to create journey" });
+  }
+});
+
+// Get journeys belonging to the logged-in user
+app.get("/api/journeys", authenticateToken, async (req, res) => {
+  try {
+    const journeys = await Journey.find({
+      userId: req.user.userId,
+    }).sort({ createdAt: -1 });
+
+    const now = Date.now();
+
+    const results = journeys.map((journey) => {
+      const item = journey.toObject();
+      const deadline =
+        new Date(item.expectedArrival).getTime() +
+        item.gracePeriodMinutes * 60 * 1000;
+
+      item.isOverdue =
+        item.status === "IN_PROGRESS" && now > deadline;
+
+      return item;
+    });
+
+    res.json(results);
+  } catch (error) {
+    console.error("Get journeys error:", error);
+    res.status(500).json({ message: "Unable to load journeys" });
+  }
+});
+
+// Mark a journey as safely completed
+app.patch(
+  "/api/journeys/:id/safe",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const journey = await Journey.findOne({
+        _id: req.params.id,
+        userId: req.user.userId,
+      });
+
+      if (!journey) {
+        return res.status(404).json({ message: "Journey not found" });
+      }
+
+      if (journey.status !== "IN_PROGRESS" &&
+          journey.status !== "OVERDUE") {
+        return res.status(400).json({
+          message: "This journey is already completed or cancelled",
+        });
+      }
+
+      journey.status = "COMPLETED";
+      journey.completedAt = new Date();
+
+      await journey.save();
+
+      res.json({
+        message: "Journey marked safe in demo mode",
+        journey,
+      });
+    } catch (error) {
+      console.error("Complete journey error:", error);
+      res.status(500).json({ message: "Unable to complete journey" });
+    }
+  }
+);
+
+// Cancel a journey
+app.patch(
+  "/api/journeys/:id/cancel",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const journey = await Journey.findOne({
+        _id: req.params.id,
+        userId: req.user.userId,
+      });
+
+      if (!journey) {
+        return res.status(404).json({ message: "Journey not found" });
+      }
+
+      if (journey.status !== "IN_PROGRESS" &&
+          journey.status !== "OVERDUE") {
+        return res.status(400).json({
+          message: "This journey is already completed or cancelled",
+        });
+      }
+
+      journey.status = "CANCELLED";
+      await journey.save();
+
+      res.json({
+        message: "Journey cancelled in demo mode",
+        journey,
+      });
+    } catch (error) {
+      console.error("Cancel journey error:", error);
+      res.status(500).json({ message: "Unable to cancel journey" });
     }
   }
 );

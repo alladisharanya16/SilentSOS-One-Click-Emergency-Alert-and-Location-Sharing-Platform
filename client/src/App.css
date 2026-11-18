@@ -525,15 +525,20 @@ button {
 ========================================== */
 
 .status-box {
+  display: block;
+  visibility: visible;
+  opacity: 1;
+  width: 100%;
   background: #ecfdf5;
-  border: 1px solid #86efac;
+  border: 2px solid #16a34a;
   color: #166534;
   padding: 13px 17px;
+  margin-top: 12px;
+  margin-bottom: 12px;
   border-radius: 10px;
   font-weight: 650;
   font-size: 14px;
 }
-
 
 /* ==========================================
    FORMS
@@ -1078,5 +1083,530 @@ button {
 
   .logout-button {
     width: 100%;
+  }
+}
+
+/* =========================================
+   SILENT SOS — DASHBOARD CARD LAYOUT FIX
+   Keep this block at the VERY END of App.css
+========================================= */
+
+.app,
+.dashboard,
+.dashboard-container,
+.header-content {
+  box-sizing: border-box;
+}
+
+.dashboard {
+  width: min(94%, 1500px);
+  max-width: 1500px;
+  margin: 32px auto;
+  padding: 0 12px;
+}
+
+.summary-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 22px;
+  width: 100%;
+  align-items: stretch;
+}
+
+.summary-grid > .summary-card {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+
+  width: 100% !important;
+  min-width: 0;
+  min-height: 150px;
+  height: auto;
+
+  padding: 24px;
+  margin: 0;
+
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.07);
+
+  overflow: visible;
+}
+
+.summary-grid > .summary-card > div:last-child {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: auto;
+}
+
+.summary-card span {
+  display: block;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.summary-card strong {
+  display: block;
+  margin-top: 8px;
+  color: #172554;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.summary-card .latest-sos {
+  font-size: 14px !important;
+  max-width: 100%;
+}
+
+.summary-grid > .summary-card .summary-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex: 0 0 56px;
+  width: 56px;
+  min-width: 56px;
+  height: 56px;
+
+  border-radius: 16px;
+  background: #eff6ff;
+  font-size: 25px;
+}
+
+/* Tablet */
+@media (max-width: 1000px) {
+  .summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .dashboard {
+    width: 100%;
+    margin: 20px auto;
+    padding: 0 16px;
+  }
+
+  .summary-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 14px;
+  }
+
+  .summary-grid > .summary-card {
+    min-height: 120px;
+    padding: 20px;
+  }
+}
+
+/* =========================================
+   SILENT SOS — FINAL DASHBOARD POLISH
+========================================= */
+
+/* Prevent decorative circles from overlapping cards */
+.summary-grid > .summary-card {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  min-height: 150px;
+}
+
+/* Hide oversized decorative pseudo-elements */
+.summary-grid > .summary-card::before,
+.summary-grid > .summary-card::after {
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Keep card content above decorations */
+.summary-grid > .summary-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Keep timestamp readable */
+.summary-card .latest-sos {
+  font-size: 13px !important;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+/* Give the header enough room */
+.header {
+  min-height: 136px;
+  height: auto;
+  padding-top: 18px;
+  padding-bottom: 22px;
+  align-items: center;
+}
+
+.header h1 {
+  margin-top: 0;
+  line-height: 1.25;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .header {
+    min-height: auto;
+    padding: 20px 16px;
+  }
+
+  .summary-grid > .summary-card {
+    min-height: 120px;
+  }
+}
+
+/* ==========================================
+   SILENTSOS — PROFESSIONAL DASHBOARD POLISH
+   ========================================== */
+
+:root {
+  --sos-navy: #0f172a;
+  --sos-blue: #2563eb;
+  --sos-text: #1e293b;
+  --sos-muted: #64748b;
+  --sos-border: #e2e8f0;
+  --sos-surface: #ffffff;
+  --sos-background: #f4f7fb;
+}
+
+body {
+  background: var(--sos-background);
+  color: var(--sos-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+.header {
+  background: linear-gradient(120deg, #0b1224, #172554 65%, #1d4ed8);
+  padding: 25px 6%;
+  box-shadow: 0 8px 26px rgba(15, 23, 42, 0.14);
+}
+
+.header h1 {
+  letter-spacing: -0.8px;
+}
+
+.dashboard {
+  width: min(94%, 1400px);
+  max-width: 1400px;
+  gap: 24px;
+  margin: 32px auto;
+}
+
+.summary-grid {
+  gap: 18px;
+}
+
+.summary-grid > .summary-card,
+.card {
+  background: var(--sos-surface);
+  border: 1px solid var(--sos-border);
+  border-radius: 18px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.045);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.summary-grid > .summary-card:hover,
+.card:hover {
+  border-color: #cbdaf3;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.075);
+}
+
+.summary-grid > .summary-card:hover {
+  transform: translateY(-2px);
+}
+
+.card {
+  padding: 26px;
+}
+
+.card h2 {
+  color: var(--sos-navy);
+  letter-spacing: -0.35px;
+}
+
+.summary-card span {
+  color: var(--sos-muted);
+}
+
+.summary-card strong {
+  color: var(--sos-navy);
+}
+
+.summary-icon {
+  border-radius: 14px;
+}
+
+.sos-card {
+  border: 1px solid #fecaca;
+  border-left: 5px solid #dc2626;
+  border-radius: 18px;
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.055);
+}
+
+.sos-button {
+  border-radius: 13px;
+  min-height: 64px;
+}
+
+.primary-button,
+.secondary-button,
+.location-button,
+.logout-button {
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.primary-button:focus-visible,
+.secondary-button:focus-visible,
+.location-button:focus-visible,
+.logout-button:focus-visible,
+.sos-button:focus-visible,
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.35);
+  outline-offset: 3px;
+}
+
+.contact-item,
+.alert-item,
+.activity-item {
+  border-radius: 13px;
+}
+
+.contact-item:hover {
+  border-color: #bfdbfe;
+}
+
+.footer {
+  color: var(--sos-muted);
+  line-height: 1.8;
+}
+
+/* Tablet */
+@media (max-width: 1000px) {
+  .dashboard {
+    width: 94%;
+  }
+
+  .summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 16px;
+  }
+
+  .card {
+    padding: 22px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .dashboard {
+    width: 100%;
+    padding: 0 14px;
+    margin: 20px auto;
+    gap: 16px;
+  }
+
+  .summary-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 12px;
+  }
+
+  .summary-grid > .summary-card {
+    min-height: 112px;
+    padding: 18px;
+    border-radius: 15px;
+  }
+
+  .card {
+    padding: 19px;
+    border-radius: 15px;
+  }
+
+  .sos-button {
+    width: 100%;
+  }
+
+  .section-heading {
+    gap: 10px;
+  }
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ===== SAFE ARRIVAL JOURNEY ===== */
+
+.journey-section {
+  border-top: 4px solid #2563eb;
+}
+
+.journey-section .section-heading h2 {
+  font-size: 23px;
+  letter-spacing: -0.5px;
+}
+
+.journey-section .section-heading p {
+  font-size: 14px;
+}
+
+.journey-section .contact-form {
+  padding: 18px;
+  margin: 0;
+  background: #f8fafc;
+  border: 1px solid #e8edf5;
+  border-radius: 14px;
+}
+
+.journey-section .form-control,
+.journey-section .form-select {
+  min-height: 46px;
+  border-radius: 10px;
+  border-color: #d5deeb;
+}
+
+.journey-section .form-control:focus,
+.journey-section .form-select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+/* Journey history list */
+
+.journey-section .contact-list {
+  gap: 14px;
+}
+
+.journey-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  min-width: 0;
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 15px;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.journey-item:hover {
+  border-color: #bfdbfe;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.07);
+}
+
+.journey-item .contact-avatar {
+  flex: 0 0 46px;
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.journey-item .contact-info {
+  flex: 1;
+  min-width: 0;
+  align-items: flex-start;
+}
+
+.journey-item .contact-info > strong {
+  font-size: 16px;
+  color: #0f172a;
+  overflow-wrap: anywhere;
+}
+
+.journey-item .contact-info > span:not(.journey-status) {
+  font-size: 13px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+/* Status badges */
+
+.journey-status {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 7px;
+  padding: 6px 10px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.35px;
+}
+
+.journey-status.is-in_progress {
+  color: #1d4ed8;
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.journey-status.is-completed {
+  color: #166534;
+  background: #dcfce7;
+  border-color: #bbf7d0;
+}
+
+.journey-status.is-cancelled {
+  color: #475569;
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.journey-status.is-overdue {
+  color: #b91c1c;
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+/* Journey action buttons */
+
+.journey-item .btn {
+  min-height: 36px;
+  padding: 7px 13px;
+  border-radius: 9px;
+  font-weight: 650;
+}
+
+@media (max-width: 600px) {
+  .journey-section .contact-form {
+    padding: 14px;
+  }
+
+  .journey-item {
+    gap: 12px;
+    padding: 15px;
+  }
+
+  .journey-item .contact-avatar {
+    flex-basis: 40px;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
   }
 }
