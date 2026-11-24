@@ -4,8 +4,7 @@ import "./App.css";
 
 
 
-const API_URL = "http://localhost:5000";
-
+const API_URL = "https://silentsos-one-click-emergency-alert-and.onrender.com";
 
 
 function App() {
